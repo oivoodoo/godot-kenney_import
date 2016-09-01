@@ -1,0 +1,71 @@
+[gd_scene load_steps=2 format=1]
+
+[ext_resource path="res://addons/kenney_importer/dialog.gd" type="Script" id=1]
+
+[node name="KenneyImport" type="ConfirmationDialog"]
+
+focus/ignore_mouse = false
+focus/stop_mouse = true
+size_flags/horizontal = 2
+size_flags/vertical = 2
+margin/left = 238.0
+margin/top = 187.0
+margin/right = 616.0
+margin/bottom = 302.0
+popup/exclusive = false
+window/title = "Kenney Importer"
+dialog/hide_on_ok = true
+script/script = ExtResource( 1 )
+__meta__ = { "__editor_plugin_screen__":"Script" }
+
+[node name="src_file" type="LineEdit" parent="."]
+
+focus/ignore_mouse = false
+focus/stop_mouse = true
+size_flags/horizontal = 2
+size_flags/vertical = 2
+margin/left = 19.0
+margin/top = 6.0
+margin/right = 285.0
+margin/bottom = 30.0
+placeholder/alpha = 0.6
+focus_mode = 2
+caret/caret_blink = false
+caret/caret_blink_speed = 0.65
+
+[node name="src_browse" type="Button" parent="."]
+
+focus/ignore_mouse = false
+focus/stop_mouse = true
+size_flags/horizontal = 2
+size_flags/vertical = 2
+margin/left = 299.0
+margin/top = 7.0
+margin/right = 357.0
+margin/bottom = 29.0
+toggle_mode = false
+enabled_focus_mode = 2
+shortcut = null
+text = "browse"
+flat = false
+
+[node name="error" type="AcceptDialog" parent="."]
+
+visibility/visible = false
+focus/ignore_mouse = false
+focus/stop_mouse = true
+size_flags/horizontal = 2
+size_flags/vertical = 2
+margin/left = 0.0
+margin/top = 0.0
+margin/right = 40.0
+margin/bottom = 40.0
+popup/exclusive = false
+window/title = "Alert!"
+dialog/hide_on_ok = true
+
+[connection signal="confirmed" from="." to="." method="_on_KenneyImport_confirmed"]
+
+[connection signal="pressed" from="src_browse" to="." method="_on_src_browse_pressed"]
+
+

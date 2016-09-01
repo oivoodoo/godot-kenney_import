@@ -1,12 +1,12 @@
 tool
-
 extends EditorPlugin
 
-var plugin = null
-var importer = preload("./gui.tscn")
+var importer
 
 func _enter_tree():
-	print("ENTRT TREE")
-	importer = importer.instance()
-	get_base_control().add_child(importer)
-	print("IMPORT PLUGIN")
+	importer = preload("res://addons/kenney_importer/importer.gd").new()
+	importer.config(get_base_control())
+	add_import_plugin(importer)
+
+func _exit_tree():
+	remove_import_plugin(importer)

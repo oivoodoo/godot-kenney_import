@@ -1,40 +1,53 @@
 tool
+extends EditorImportPlugin
 
-extends Control
-
-onready var dialog = get_node("Dialog")
-var fileDialog = FileDialog.new()
 
 const SEL_INPUT_META = 0;
 const SEL_OUTPUT_TEX = 1;
 
-func _ready():
-	print("TESTTING")
-	fileDialog.connect("file_selected", self, "_fileSelected")
-	add_child(fileDialog)
+var dialog = null
 
-	dialog.get_ok().set_text("Import")
-	dialog.set_pos(Vector2(get_viewport_rect().size.width/2 - dialog.get_rect().size.width/2, get_viewport_rect().size.height/2 - dialog.get_rect().size.height/2))
-	# dialog.show()
+func get_name():
+	return "kenny_importer"
 
+func get_visible_name():
+	return "Kenny Importer"
 
+func import_dialog(path):
+	var md = null
+	if (path != ""):
+		md = ResourceLoader.load_import_metadata(path)
+
+	dialog.configure(self, path, md)
+	dialog.popup_centered()
+
+func config(base_control):
+	dialog = preload("res://addons/kenney_importer/dialog.tscn").instance()
+	base_control.add_child(dialog)
+
+func import(metadata):
+	var path = metadata.get_source_path(0)
+	load_spritesheet(path)
 
 class SpriteFrame extends Reference:
 	var name = ""
 	var region = Rect2(0, 0, 0, 0)
 	var rotation = 0
 
-# func _ready():
-	# load_spritesheet("/Users/oivoodoo/projects/games/mario/assets/sprites/spritesheet_tilesRed.xml")
-
 func load_spritesheet(path):
+	var logger = File.new()
+	logger.open("/tmp/mario.log", File.WRITE)
+
 	var file = File.new()
 	file.open(path, File.READ)
 	if file.is_open():
 		var content = file.get_as_text()
 		var atlas = _parse(content)
 		_save(path, atlas)
+		logger.store_line(content)
 	file.close()
+
+	logger.close()
 
 func _get_parent_dir(path):
 	var fileName = path.substr(0, path.find_last("/"))
