@@ -35,23 +35,16 @@ class SpriteFrame extends Reference:
 	var rotation = 0
 
 func load_spritesheet(path):
-	var logger = File.new()
-	logger.open("/tmp/mario.log", File.WRITE)
-
 	var file = File.new()
 	file.open(path, File.READ)
 	if file.is_open():
 		var content = file.get_as_text()
 		var atlas = _parse(content)
 		_save(path, atlas)
-		logger.store_line(content)
 	file.close()
 
-	logger.close()
-
 func _get_parent_dir(path):
-	var fileName = path.substr(0, path.find_last("/"))
-	return fileName
+	return path.substr(0, path.find_last("/"))
 
 func _get_file_name(path):
 	var filename = path.substr(path.find_last("/")+1, path.length() - path.find_last("/")-1)
@@ -60,27 +53,37 @@ func _get_file_name(path):
 		filename = filename.substr(0, pos)
 	return filename
 
-func _save(path, atlas):
+func _load_atlas_tex(metaPath, atlas):
+	var path
+
+	var file = File.new()
+	if file.file_exists(str(_get_parent_dir(metaPath), "/", atlas.imagePath)):
+		path = str(_get_parent_dir(metaPath), "/", atlas.imagePath)
+	else:
+		path = str(_get_parent_dir(metaPath), "/", _get_file_name(metaPath), ".png")
+
 	var tex = null
 	if ResourceLoader.has(path):
 		tex = ResourceLoader.load(path)
 	else:
 		tex = ImageTexture.new()
 	tex.load(path)
+	return tex
 
-	if not ResourceLoader.has(path):
-		tex.set_path(path)
-	else:
-		tex.take_over_path(path)
-	tex.set_name(path)
-	ResourceSaver.save(path, tex)
-
+func _save(path, atlas):
 	var target_dir = _get_parent_dir(path)
+
+	# Lets create the directory where we should store the new generated
+	# sprites and atlas.
+	var dir = Directory.new()
+	dir.make_dir(target_dir + "/generated")
+
+	var tex = _load_atlas_tex(path, atlas)
+	ResourceSaver.save(str(target_dir, "/generated/"), tex)
 
 	for s in atlas.sprites:
 		var atex = AtlasTexture.new()
-		var ap = str(target_dir, "/", _get_file_name(path), ".", _get_file_name(s.name), ".atex")
-		print(ap)
+		var ap = str(target_dir, "/generated/", _get_file_name(path), ".", _get_file_name(s.name), ".atex")
 		if not ResourceLoader.has(ap):
 			atex.set_path(ap)
 		else:
@@ -90,7 +93,6 @@ func _save(path, atlas):
 		atex.set_atlas(tex)
 		atex.set_region(s.region)
 		ResourceSaver.save(ap, atex)
-	return tex
 
 func _parse(content):
 	var atlas = {}
